@@ -19,8 +19,7 @@ resource ibm_resource_key cos_key {
 }
 
 resource ibm_cos_bucket sink_bucket {
-  bucket_name          = "${var.basename}-sink-bucket-test1"
-  key_protect          = data.terraform_remote_state.kms.outputs.key.crn
+  bucket_name          = "${var.basename}-sink-bucket-test11"
   resource_instance_id = ibm_resource_instance.cos.id
   region_location      = var.region
   storage_class        = "smart"

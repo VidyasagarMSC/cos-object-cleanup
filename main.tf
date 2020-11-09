@@ -1,6 +1,10 @@
+data "ibm_resource_group" "group" {
+  name = var.resource_group
+}
+
 resource ibm_resource_instance cos {
   name              = "${var.basename}-cos"
-  resource_group_id = var.resource_group_id
+  resource_group_id = ibm_resource_group.group.id
   service           = "cloud-object-storage"
   plan              = "standard"
   location          = "global"
@@ -18,8 +22,8 @@ resource ibm_resource_key cos_key {
   }
 }
 
-resource ibm_cos_bucket sink_bucket {
-  bucket_name          = "${var.basename}-sink-bucket-test11"
+resource ibm_cos_bucket bucket {
+  bucket_name          = "${var.basename}-bucket"
   resource_instance_id = ibm_resource_instance.cos.id
   region_location      = var.region
   storage_class        = "smart"
@@ -30,11 +34,11 @@ resource null_resource delete_objects {
     ACCESS_KEY             = ibm_resource_key.cos_key.credentials["cos_hmac_keys.access_key_id"]
     SECRET_ACCESS_KEY      = ibm_resource_key.cos_key.credentials["cos_hmac_keys.secret_access_key"]
     COS_REGION             = var.region
-    COS_BUCKET_NAME        = ibm_cos_bucket.sink_bucket.bucket_name
+    COS_BUCKET_NAME        = ibm_cos_bucket.bucket.bucket_name
   }
   provisioner "local-exec" {
     when = destroy
     command = "./delete-cos-objects.sh ${self.triggers.COS_REGION} ${self.triggers.ACCESS_KEY} ${self.triggers.SECRET_ACCESS_KEY} ${self.triggers.COS_BUCKET_NAME} "
   }
-  depends_on = [ibm_resource_key.cos_key,ibm_cos_bucket.sink_bucket]
+  depends_on = [ibm_resource_key.cos_key,ibm_cos_bucket.bucket]
 }

@@ -6,11 +6,11 @@ variable "ibmcloud_timeout" {
   default = 900
 }
 
-variable "resource_group_id"{}
+variable "resource_group"{}
 
 variable "basename" {
 }
 
 variable "tags" {
-  default = ["terraform", "analytics"]
+  default = ["terraform", "cos"]
 }
